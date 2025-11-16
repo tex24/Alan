@@ -89,11 +89,12 @@ vector<vector<float>> mulMatrix(vector<vector<float>> A,
 
 vector<vector<float>> gauss(vector<vector<float>> A, vector<vector<float>> B) {
   float m;
+  int offset = 0;
   for (unsigned int k = 0; k < A.size(); k++) {
 
     float aux = A[k][k];
     for (unsigned int i = (k + 1); i < A.size(); i++) {
-      if (abs(A[i][k]) > abs(aux)) {
+      if (abs(A[i][k + offset]) > abs(aux)) {
         vector<float> tmp = A[i];
         A[i] = A[k];
         A[k] = tmp;
@@ -102,14 +103,18 @@ vector<vector<float>> gauss(vector<vector<float>> A, vector<vector<float>> B) {
     }
 
     if (A[k][k] == 0) {
-      cout << "- Pivoting impossibile!";
-      break;
+    	offset++;
+	if(offset + k > A[0].size()){
+		return A;
+	}
+	k--; //controllo sulla stessa riga (dato che k + 1 - 1 = k) su colonna k + offset
+	continue;
     }
 
     for (unsigned int i = (k + 1); i < A.size(); i++) {
-      m = (A[i][k] / A[k][k]);
-      B[i][0] -= (m * B[k][0]);
-      for (unsigned int j = k; j < A.size(); j++) {
+      m = (A[i][k + offset] / A[k][k + offset]);
+      B[i][0] -= (m * B[k + offset][0]);
+      for (unsigned int j = k + offset; j < A.size(); j++) {
         A[i][j] -= (m * A[k][j]);
       }
     }
@@ -166,6 +171,12 @@ int main(int argc, char *argv[]) {
   printMatrix(gauss(creaPascal(10), X2));
   cout << "- Gauss Tridiagonale:\n";
   printMatrix(gauss(creaTrid(), X3));
+  cout << "- Gauss Matrice non invertibile: \n";
+  printMatrix(gauss({
+ 	{1, 2, 3, 4},
+ 	{1, 2, 3, 4},
+ 	{0, 1, 0, 1},
+ 	{2, 0, 1, 0}}, X1));
 
   return 0;
 }
