@@ -14,7 +14,7 @@ void printMatrix(const vector<vector<float>> &x) {
       std::string s = oss.str();
       if (v >= 0)
         s = " " + s;
-      cout << std::setw(8) << s << " ";
+      cout << std::setw(9) << s << " ";
     }
     cout << endl;
   }
@@ -87,7 +87,8 @@ vector<vector<float>> mulMatrix(vector<vector<float>> A,
   return res;
 }
 
-vector<vector<float>> gauss(vector<vector<float>> A, vector<vector<float>> B) {
+vector<vector<float>> gauss(vector<vector<float>> &A,
+                            vector<vector<float>> &B) {
   float m;
   for (unsigned int k = 0; k < A.size(); k++) {
 
@@ -118,10 +119,42 @@ vector<vector<float>> gauss(vector<vector<float>> A, vector<vector<float>> B) {
   return A;
 }
 
-vector<vector<float>> sost(vector<vector<float>> A, vector<vector<float>> B) {
-
-  for (int i = A[0].size() - 1; i >= 0; i--) {
+vector<vector<float>> sost(vector<vector<float>> &A, vector<vector<float>> &B) {
+  vector<vector<float>> x;
+  // inizializzo il vettore x
+  for (unsigned int i = 0; i < A.size(); i++)
+    x.push_back(vector<float>());
+  int n = A.size() - 1; // variabile per l ultima pos
+  for (int i = n; i >= 0; i--) {
+    float sum = 0;
+    for (int j = i + 1; j <= n; j++) {
+      sum += A[i][j] * x[j][0];
+    }
+    x[i].push_back((B[i][0] - sum) / A[i][i]);
   }
+  return x;
+}
+
+vector<vector<float>> deltaB(vector<vector<float>> B) {
+  vector<vector<float>> ris;
+  float valNeg = static_cast<float>(-0.01) * infNorma(B); // neg di negativo
+  float valPos = static_cast<float>(0.01) * infNorma(B);
+  for (unsigned int i = 0; i < B.size(); i++) {
+    i % 2 == 0 ? ris.push_back({valNeg}) : ris.push_back({valPos});
+  }
+  return ris;
+}
+
+vector<vector<float>> sumVect(vector<vector<float>> X,
+                              vector<vector<float>> Y) {
+  if (X.size() != Y.size()) {
+    // TODO
+  }
+  vector<vector<float>> ris;
+  for (unsigned int i = 0; i < X.size(); i++) {
+    ris.push_back({X[i][0] + Y[i][0]});
+  }
+  return ris;
 }
 
 int main(int argc, char *argv[]) {
@@ -129,14 +162,13 @@ int main(int argc, char *argv[]) {
       {3, 1, -1, 0}, {0, 7, -3, 0}, {0, -3, 9, -2}, {0, 0, 4, -10}};
   vector<vector<float>> A2 = {
       {2, 4, -2, 0}, {1, 3, 0, 1}, {3, -1, 1, 2}, {0, -1, 2, 1}};
-
+  vector<vector<float>> pascal = creaPascal(10);
+  vector<vector<float>> trid = creaTrid();
   cout << "Esercizio 1:" << endl;
   cout << "- Norma della matrice A1: \n  " << infNorma(A1) << endl;
   cout << "- Norma della matrice A2: \n  " << infNorma(A2) << endl;
-  cout << "- Norma della matrice di Pascal: \n  " << infNorma(creaPascal(10))
-       << endl;
-  cout << "- Norma della matrice Tridiagonale: \n  " << infNorma(creaTrid())
-       << endl;
+  cout << "- Norma della matrice di Pascal: \n  " << infNorma(pascal) << endl;
+  cout << "- Norma della matrice Tridiagonale: \n  " << infNorma(trid) << endl;
 
   vector<vector<float>> X1 = {{1}, {1}, {1}, {1}};
   vector<vector<float>> X2 = {{1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}};
@@ -152,20 +184,53 @@ int main(int argc, char *argv[]) {
   vector<vector<float>> B2 = mulMatrix(A2, X1);
   printMatrix(B2);
   cout << "- Termine noto della matrice di Pascal e X: \n";
-  vector<vector<float>> B3 = mulMatrix(creaPascal(10), X2);
+  vector<vector<float>> B3 = mulMatrix(pascal, X2);
   printMatrix(B3);
   cout << "- Termine noto della matrice tridiagonale e X: \n";
-  vector<vector<float>> B4 = mulMatrix(creaTrid(), X3);
+  vector<vector<float>> B4 = mulMatrix(trid, X3);
   printMatrix(B4);
 
   cout << "- Gauss A1:\n";
-  printMatrix(gauss(A1, X1));
+  printMatrix(gauss(A1, B1));
+  cout << "  Con x:\n";
+  printMatrix(sost(A1, B1));
   cout << "- Gauss A2:\n";
-  printMatrix(gauss(A2, X1));
+  printMatrix(gauss(A2, B2));
+  cout << "  Con x:\n";
+  printMatrix(sost(A2, B2));
   cout << "- Gauss Pascal:\n";
-  printMatrix(gauss(creaPascal(10), X2));
+  printMatrix(gauss(pascal, B3));
+  cout << "  Con x:\n";
+  printMatrix(sost(pascal, B3));
   cout << "- Gauss Tridiagonale:\n";
-  printMatrix(gauss(creaTrid(), X3));
+  printMatrix(gauss(trid, B4));
+  cout << "  Con x:\n";
+  printMatrix(sost(trid, B4));
+
+  cout << "\nEsercizio 3:\n";
+
+  vector<vector<float>> B1Tilde = sumVect(B1, deltaB(B1));
+  vector<vector<float>> B2Tilde = sumVect(B2, deltaB(B2));
+  vector<vector<float>> B3Tilde = sumVect(B3, deltaB(B3));
+  vector<vector<float>> B4Tilde = sumVect(B4, deltaB(B4));
+
+  A1 = {{3, 1, -1, 0}, {0, 7, -3, 0}, {0, -3, 9, -2}, {0, 0, 4, -10}};
+  A2 = {{2, 4, -2, 0}, {1, 3, 0, 1}, {3, -1, 1, 2}, {0, -1, 2, 1}};
+  pascal = creaPascal(10);
+  trid = creaTrid();
+
+  cout << "- x di A1 con B1Tilde:\n";
+  gauss(A1, B1Tilde);
+  printMatrix(sost(A1, B1Tilde));
+  cout << "- x di A2 con B2Tilde:\n";
+  gauss(A2, B2Tilde);
+  printMatrix(sost(A2, B2Tilde));
+  cout << "- x della matrice di Pascal con B1Tilde:\n";
+  gauss(pascal, B3Tilde);
+  printMatrix(sost(pascal, B3Tilde));
+  cout << "- x della matrice tridiagonale con B4Tilde:\n";
+  gauss(trid, B4Tilde);
+  printMatrix(sost(trid, B4Tilde));
 
   return 0;
 }
