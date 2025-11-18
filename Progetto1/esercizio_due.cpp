@@ -2,6 +2,14 @@
 #include <cmath>
 using namespace std;
 
+double erroreAssoluto(double y, double tildeY){
+    return tildeY - y;
+}
+
+double erroreRelativo(double y, double tildeY){
+    return erroreAssoluto(y, tildeY) / y;
+}
+
 double fattoriale(int x)
 {
     double ris = 1;
@@ -23,20 +31,38 @@ double fN(double x, int N)
 }
 
 void printExpAndTaylorAlgOne(double exponent, int *n, size_t len){
+    double y, tildeY;
     for (size_t i = 0; i < len; i++)
     {
-        cout << fN(exponent, n[i]) << " " << exp(exponent) << endl;
+        y = exp(exponent);
+        tildeY = fN(exponent, n[i]);
+        cout << tildeY << " " << y << endl;
+        cout << "Errore assoluto: " << erroreAssoluto(y, tildeY) << endl;
+        cout << "Errore relativo: " << erroreRelativo(y, tildeY) << endl;
     }
     cout << endl;
 }
 
 void printExpAndTaylorAlgTwo(double exponent, int *n, size_t len){
+    double y, tildeY;
     if(exponent >= 0)
         for (size_t i = 0; i < len; i++)
-            cout << fN(exponent, n[i]) << " " << exp(exponent) << endl;
+        {
+            y = exp(exponent);
+            tildeY = fN(exponent, n[i]);
+            cout << tildeY << " " << y << endl;
+            cout << "Errore assoluto: " << erroreAssoluto(y, tildeY) << endl;
+            cout << "Errore relativo: " << erroreRelativo(y, tildeY) << endl;
+        }
     else 
         for (size_t i = 0; i < len; i++)
-            cout << 1 / fN(-exponent, n[i]) << " " << exp(exponent) << endl;
+        {
+            y = exp(-exponent);
+            tildeY = fN(-exponent, n[i]);
+            cout << tildeY << " " << y << endl;
+            cout << "Errore assoluto: " << erroreAssoluto(y, tildeY) << endl;
+            cout << "Errore relativo: " << erroreRelativo(y, tildeY) << endl;
+        }
     cout << endl;
 }
 

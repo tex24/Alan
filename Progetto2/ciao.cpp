@@ -9,12 +9,12 @@ using namespace std;
 void printMatrix(const vector<vector<float>> &x) {
   for (auto &row : x) {
     for (float v : row) {
-      std::ostringstream oss;
-      oss << std::fixed << std::setprecision(2) << v;
-      std::string s = oss.str();
+      ostringstream oss;
+      oss << fixed << setprecision(2) << v;
+      string s = oss.str();
       if (v >= 0)
         s = " " + s;
-      cout << std::setw(9) << s << " ";
+      cout << setw(9) << s << " ";
     }
     cout << endl;
   }
@@ -90,32 +90,32 @@ vector<vector<float>> mulMatrix(vector<vector<float>> A,
 vector<vector<float>> gauss(vector<vector<float>> &A,
                             vector<vector<float>> &B) {
   float m;
-  int offset = 0;
+  vector<float> tmp;
   for (unsigned int k = 0; k < A.size(); k++) {
 
-    float aux = A[k][k];
-    for (unsigned int i = (k + 1); i < A[0].size(); i++) {
-      if (abs(A[i][k + offset]) > abs(aux)) {
-        vector<float> tmp = A[i];
+    float aux = fabs(A[k][k]);
+    for (unsigned int i = (k + 1); i < A.size(); i++) { // Nota per Gesualdi, scambiare le righe di B la prossima volta
+      if (fabs(A[i][k]) > aux) {
+        tmp = A[i];
         A[i] = A[k];
         A[k] = tmp;
-        aux = A[k][k];
+        tmp = B[i];
+        B[i] = B[k];
+        B[k] = tmp;
+        aux = fabs(A[k][k]);
       }
     }
 
     if (A[k][k] == 0) {
-    	offset++;
-	if(offset + k > A[0].size()){
-		return A;
-	}
-	k--; //controllo sulla stessa riga (dato che k + 1 - 1 = k) su colonna k + offset
-	continue;
+      cout << "MATRICE NON INVERTIBILE!" << endl;
+      return A;
     }
 
     for (unsigned int i = (k + 1); i < A[0].size(); i++) {
-      m = (A[i][k + offset] / A[k][k + offset]);
-      B[i][0] -= (m * B[k + offset][0]);
-      for (unsigned int j = k + offset; j < A.size(); j++) {
+      m = (A[i][k] / A[k][k]);
+      B[i][0] -= (m * B[k][0]);
+      A[i][k] = 0;
+      for (unsigned int j = (k + 1); j < A.size(); j++) {
         A[i][j] -= (m * A[k][j]);
       }
     }
@@ -195,6 +195,10 @@ int main(int argc, char *argv[]) {
   vector<vector<float>> B4 = mulMatrix(trid, X3);
   printMatrix(B4);
 
+  cout << "Matrice A1 prima di gauss" << endl;
+  printMatrix(A1);
+  cout << "Matrice A2 prima di gauss" << endl;
+   printMatrix(A2);
   cout << "- Gauss A1:\n";
   printMatrix(gauss(A1, B1));
   cout << "  Con x:\n";
