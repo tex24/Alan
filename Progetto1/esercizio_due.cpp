@@ -2,11 +2,13 @@
 #include <cmath>
 using namespace std;
 
-double erroreAssoluto(double y, double tildeY){
+double erroreAssoluto(double y, double tildeY)
+{
     return tildeY - y;
 }
 
-double erroreRelativo(double y, double tildeY){
+double erroreRelativo(double y, double tildeY)
+{
     return erroreAssoluto(y, tildeY) / y;
 }
 
@@ -30,36 +32,40 @@ double fN(double x, int N)
     return ris;
 }
 
-void printExpAndTaylorAlgOne(double exponent, int *n, size_t len){
+void printExpAndTaylorAlgOne(double exponent, int *n, size_t len)
+{
     double y, tildeY;
     for (size_t i = 0; i < len; i++)
     {
         y = exp(exponent);
         tildeY = fN(exponent, n[i]);
-        cout << tildeY << " " << y << endl;
+        cout << "N = " << n[i] << endl
+             << "Taylor: " << tildeY << "\tExp: " << y << endl;
         cout << "Errore assoluto: " << erroreAssoluto(y, tildeY) << endl;
         cout << "Errore relativo: " << erroreRelativo(y, tildeY) << endl;
     }
     cout << endl;
 }
 
-void printExpAndTaylorAlgTwo(double exponent, int *n, size_t len){
+void printExpAndTaylorAlgTwo(double exponent, int *n, size_t len)
+{
     double y, tildeY;
-    if(exponent >= 0)
+    y = exp(exponent);
+    if (exponent >= 0)
         for (size_t i = 0; i < len; i++)
         {
-            y = exp(exponent);
             tildeY = fN(exponent, n[i]);
-            cout << tildeY << " " << y << endl;
+            cout << "N = " << n[i] << endl
+                 << "Taylor: " << tildeY << "\tExp: " << y << endl;
             cout << "Errore assoluto: " << erroreAssoluto(y, tildeY) << endl;
             cout << "Errore relativo: " << erroreRelativo(y, tildeY) << endl;
         }
-    else 
+    else
         for (size_t i = 0; i < len; i++)
         {
-            y = exp(-exponent);
-            tildeY = fN(-exponent, n[i]);
-            cout << tildeY << " " << y << endl;
+            tildeY = 1/fN(-exponent, n[i]);
+            cout << "N = " << n[i] << endl
+                 << "Taylor: " << tildeY << "\tExp: " << y << endl;
             cout << "Errore assoluto: " << erroreAssoluto(y, tildeY) << endl;
             cout << "Errore relativo: " << erroreRelativo(y, tildeY) << endl;
         }
@@ -74,16 +80,20 @@ int main()
     double tests[] = {0.5, 30, -0.5, -30};
     size_t length_tests = 4;
 
-    cout << "ALGORITMO N. 1" << endl << endl;
+    cout << "ALGORITMO N. 1" << endl
+         << endl;
 
-    for(size_t i = 0; i < length_tests; i ++){
+    for (size_t i = 0; i < length_tests; i++)
+    {
         cout << "Exponent = " << tests[i] << endl;
         printExpAndTaylorAlgOne(tests[i], N_values, length_N);
     }
 
-    cout << "ALGORITMO N. 2" << endl << endl;
+    cout << "ALGORITMO N. 2" << endl
+         << endl;
 
-    for(size_t i = 0; i < length_tests; i ++){
+    for (size_t i = 2; i < length_tests; i++)
+    {
         cout << "Exponent = " << tests[i] << endl;
         printExpAndTaylorAlgTwo(tests[i], N_values, length_N);
     }
