@@ -1,132 +1,121 @@
 % Numero di matricola S5798663
-d0 = 3
-d1 = 6
-m = 10*(d0 + 1) + d1
-A = zeros(m,3);
-
-for r = 1:m
-    for c = 1:3
-        if c == 1
-            A(r,c) = 1;
-        elseif c == 2
-            A(r,c) = r/m;
-        else 
-            A(r,c) = (r/m)^2;
-        end
-    end
-end
+d0 = 3;
+d1 = 6;
+m = 10*(d0+1) + d1;
+x = (1:m)'/m;
+A = [ones(m,1), x, x.^2];
 
 %-------------------------------------------------------
 % ESERCIZIO 1
+fprintf("ESERCIZIO 1\n\n")
+
+fprintf("A = U1 * S1 * V1'\nA' = U2 * S2 * V2'\n\n")
+
 % 1.1
+fprintf("1.1\n\n")
 [U1, S1, V1] = svd(A);
 [U2, S2, V2] = svd(A');
 
 % V1 = U2
-isequal(U2, V1)
+fprintf("||V1 - U2|| = %.3e => V1 = V2\n\n", norm(V1 - U2))
 
 % S1 == S2
-isequal(S1, S2')
+fprintf("||S1 - S2'|| = %.3e => S1 = S2'\n\n", norm(S1 - S2'))
 
 % V2 = U1
-isequal(U1, V2)
+fprintf("||U1 - V2|| = %.3e => U1 = V2\n\n", norm(U1 - V2))
 
-V1 - U2
-
-S1 - S2'
-
-U1 - V2
-
-% Notiamo che i numeri differiscono di poco, e quindi probabilmente
-% abbiamo avuto un errore algoritmico.
+% Notiamo che gli autovettori e gli autovalori sono uguali
 
 % 1.2
-[U3, S3, V3] = svd(A*A');
-[U4, S4, V4] = svd(A'*A);
+fprintf("1.2\n\n")
+% Prendo gli autovalori non nulli e li ordino per modulo
+S3 = eig(A*A');
+S3v = S3(end-2:end);
+tmp = S3v(1,:);
+S3v(1,:) = S3v(3,:);
+S3v(3,:) = tmp;
+S4v = eig(A'*A);
+tmp = S4v(1,:);
+S4v(1,:) = S4v(3,:);
+S4v(3,:) = tmp;
 
-% S3 = S4
-isequal(diag(S3), diag(S4))
+% S1 == S3
+fprintf("||S1 - S3|| = %.3e => S1 != S3\n\n", norm(diag(S1) - S3v))
 
-% L'errore è ancora minimo, quindi potremmo aver avuto ancora
-% un errore algoritmico
+% S2 == S4
+fprintf("||S1 - S4|| = %.3e => S1 != S4\n\n", norm(diag(S1) - S4v))
+
+% S1.^2 == S3
+fprintf("||S1.^2 - S3|| = %.3e => S1.^2 ≈ S3\n\n", norm(diag(S1.^2) - S3v))
+
+% S2.^2 == S4
+fprintf("||S1.^2 - S4|| = %.3e => S1.^2 ≈ S4\n\n", norm(diag(S1.^2) - S4v))
+
+
+% La differenza è minima, quindi potremmo aver avuto un errore algoritmico,
+% però sappiamo che i valori sulla diagonale di S1 al quadrato equivalgono
+% ai lambda sulla diagonale di S3 (autovalori di A*A') e S4 (autovalori di 
+% A'*A).
 
 % 1.3
-disp("Immagine di A")
-orth(A)
-disp("Im(A) = U " + newline + "(U calcolato con A)")
-isequal(U1, orth(A))
+fprintf("1.3\n\n")
+rA = rank(A);
+fprintf("||U(:,1:rank(A)) - Im(A)|| = %.3e => Im(A) = U(:,1:rank(A)) \n(U calcolato con A)\n\n", norm(U1(:,1:rA) - orth(A)))
+% Le prime rA colonne di U sono i vettori singolari associati ai valori 
+% singolari non nulli, e generano Im(A).
 
-disp("Immagine di A'")
-orth(A')
-disp("Im(A') = U " + newline + "(U calcolato con A')")
-isequal(U2, orth(A'))
 
-% Otteniamo che le immagini sono uguali al vettore sinistro 
-% su cui abbiamo calcolato SVD
+fprintf("||U(:,1:rank(A')) - Im(A')|| = %.3e => Im(A') = U(:,1:rank(A')) \n(U calcolato con A')\n\n", norm(U2 - orth(A')))
+
+% Otteniamo che l'immagine è presente nella matrice sinistra, considerando
+% solo gli autovettori con autovalore non nullo (e quindi non appartenenti
+% al Kernel).
 
 % 1.4
-disp("Nucleo di A")
-null(A)
-disp("V (calcolato su A)")
-V1
+fprintf("1.4\n\n")
+N = null(A);
+rN = rank(A);
+fprintf("||Ker(A) - V(:,rank(Ker(A)) + 1:end)|| = %.3e => Ker(A) = V(:,rank(Ker(A)) + 1:end) \n(V calcolato su A)\n\n", norm(N - V1(:,rN + 1:end)))
+% Le colonne di V associate ai valori singolari nulli formano una base del 
+% kernel della matrice.
 
-disp("Nucleo di A'")
-null(A')
-disp("V (calcolato su A')")
-V2
+Nt = null(A');
+rNt = rank(A');
+fprintf("||Ker(A') - V(:,:,rank(Ker(A')) + 1:end)|| = %.3e => Ker(A') = V(:,rank(Ker(A')) + 1:end) \n(V calcolato su A')\n\n", norm(Nt - V2(:,rNt + 1:end)))
+% Prendo solo gli autovettori che appartengono al Kernel
 
-% DA RICONTROLLARE 
-% Dal momento che non abbiamo vettori nulli in V2, questo implica
-% che il kernel risulta banale, come possiamo notare
+% Possiamo notare che i valori di V1 (e V2 per A') corrispondono al kernel
+% della matrice sulla quale sono stati calcolati.
 
 
 %-------------------------------------------------------
 % ESERCIZIO 2
 
-n = 3;
-B = zeros(n,n);
-
-for r = 1:n
-    for c = 1:n
-        if r < c
-            B(r,c) = -1;
-        elseif r == c
-            B(r,c) = 1;
-        else 
-            B(r,c) = 0;
-        end
-    end
-end
-
-B
+fprintf("------------\n\nESERCIZIO 2\n\n")
 
 % 2.1
+fprintf("\n2.1\n\n")
+n = 3;
+B = triu(-ones(n, n), 1) + eye(n);
 [U5, S5, V5] = svd(B);
-disp("Valori singolari di B:");
+fprintf("Valori singolari di B:\n");
 disp(diag(S5));
 
 % 2.2
-
-i = 0;
-while i < 100 % Per ora metto 100, ma poi bisogna mettere 300
-    i = i + 1;
-    Bn = zeros(i,i);
-    for r = 1:i
-        for c = 1:i
-            if r < c
-                Bn(r,c) = -1;
-            elseif r == c
-                Bn(r,c) = 1;
-            else 
-                Bn(r,c) = 0;
-            end
-        end
-    end
-    disp("Valore singolare massimo di Bn, con n = " + i + ":");
+fprintf("\n2.2\n")
+i = 1;
+while i <= 100
+    Bn = triu(-ones(i, i), 1) + eye(i);
     [U6, S6, V6] = svd(Bn);
-    disp(max(diag(S6)));
-    disp("Condizionamento in norma 2, con n = " + i + ":");
-    disp(max(diag(S6))/min(diag(S6)));
+    sMax = S6(1);
+    sMin = S6(end);
+
+    fprintf("\nn = %d\n", i);
+    fprintf("Valore singolare massimo di Bn: %.3e\n", sMax);
+    fprintf("Valore singolare minimo di Bn: %.3e\n", sMin);
+    fprintf("Condizionamento in norma 2: %.3e\n", max(diag(S6))/min(diag(S6)));
+    i = (i >= 50) * (i + 10) + (i >= 5 && i < 50) * (i + 5) + (i < 5) * (i + 1);
 end
 
 % Possiamo che la funzione che prende il valore singolare massimo di Bn
@@ -136,29 +125,34 @@ end
 % esce monotona.
 
 % 2.3
-B(n, 1) = B(n, 1) - (2^(2-n));
-eig(B)
+fprintf("\n2.3\n")
+i = 1;
+while i <= 100
+    Bn = triu(-ones(i, i), 1) + eye(i);
+    Bn(i, 1) = Bn(i, 1) - (2^(2-i));
+    fprintf("\nn = %d", i);
+    fprintf("\nValore singolare minimo: %.3e\n", min(abs(eig(Bn))));
+    i = (i >= 50) * (i + 10) + (i >= 5 && i < 50) * (i + 5) + (i < 5) * (i + 1);
+end
+
 
 % 2.4
-% Possiamo notare dall'esercizio 2.3 che un autovalore tende a 0. Questo e
-% dovuto dal fatto che con un valore nella posizione (n, 1) non abbiamo piú
-% una matrice triangolare superiore, e l'ultima colonna la possiamo
-% ottenere dallo span delle rimanenti.
+% La perturbazione su B(n,1)​ rende B quasi singolare: un 
+% autovalore è vicino a 0 e il valore singolare minimo risulta molto 
+% piccolo. In termini di rango numerico, le colonne diventano quasi 
+% dipendenti, e il condizionamento in norma 2 cresce sensibilmente.
 
 
 %-------------------------------------------------------
 % ESERCIZIO 3
 
+fprintf("------------\n\nESERCIZIO 3\n\n")
 
-y = zeros(m, 1);
-
-for j = 1:m
-    y(j, 1) = sin(m\j);
-end
-
-y
+x = (1:m)'/m;
+y = sin(x);
 
 % 3.1
+fprintf("\n3.1\n\n")
 L = S1 * V1';
 R = U1' * y;
 
@@ -173,6 +167,8 @@ disp(L \ R)
 
 % 3.2
 
+fprintf("\n3.2\n\n")
+
 [Q1, R1] = qr(A);
 
 L = R1;
@@ -183,6 +179,8 @@ disp(L \ R)
 
 % 3.3
 
+fprintf("\n3.3\n\n")
+
 L = A' * A;
 R = A' * y;
 
@@ -190,5 +188,8 @@ disp("(A' * A) \ (A' * y) = " + newline)
 disp(L \ R)
 
 % 3.4
+
+fprintf("\n3.4\n\n")
+
 disp("A \ y = " + newline)
 disp(A \ y)

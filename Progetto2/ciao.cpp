@@ -153,7 +153,7 @@ vector<vector<float>> deltaB(vector<vector<float>> B) {
 vector<vector<float>> sumVect(vector<vector<float>> X,
                               vector<vector<float>> Y) {
   if (X.size() != Y.size()) {
-    // TODO
+    throw "Dimensioni diverse!\n";
   }
   vector<vector<float>> ris;
   for (unsigned int i = 0; i < X.size(); i++) {
