@@ -3,29 +3,30 @@
 ### Esercizio 1
 Per compilare l'esercizio 1, eseguire il seguente comando:
 ```
-g++ -Wall esercizio_uno.cpp -o es1
+g++ -Wall esercizio1.cpp shared_functions.cpp -o esercizio1
 ```
 Per eseguire l'esercizio 1, utilizzare il comando:
 ```
-./es1
+./esercizio1
 ```
 
 ### Esercizio 2
 Per compilare l'esercizio 2, eseguire il seguente comando:
 ```
-g++ -Wall esercizio_due.cpp -o es2
+g++ -Wall esercizio2.cpp shared_functions.cpp -o esercizio2
 ```
 Per eseguire l'esercizio 2, utilizzare il comando:
 ```
-./es2
+./esercizio2
 ```
 
 ### Esercizio 3
 Per compilare l'esercizio 3, eseguire il seguente comando:
 ```
-g++ -Wall esercizio_tre.cpp -o es3
+g++ -Wall esercizio3.cpp shared_functions.cpp -o esercizio3
 ```
 Per eseguire l'esercizio 3, utilizzare il comando:
 ```
-./es3
+./esercizio3
 ```
+

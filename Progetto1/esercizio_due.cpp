@@ -4,12 +4,12 @@ using namespace std;
 
 double erroreAssoluto(double y, double tildeY)
 {
-    return tildeY - y;
+    return fabs(tildeY - y);
 }
 
 double erroreRelativo(double y, double tildeY)
 {
-    return erroreAssoluto(y, tildeY) / y;
+    return fabs(erroreAssoluto(y, tildeY) / y);
 }
 
 double fattoriale(int x)
@@ -25,7 +25,7 @@ double fattoriale(int x)
 double fN(double x, int N)
 {
     double ris = 0;
-    for (int n = 0; n < N; n++)
+    for (int n = 0; n <= N; n++)
     {
         ris += pow(x, n) / fattoriale(n);
     }
