@@ -32,7 +32,7 @@ end
 
 % Possiamo che la funzione che prende il valore singolare massimo di Bn
 % risulta strettamente crescente nell'intervallo I nel quale la abbiamo
-% studiata, con I = [1, 300].
+% studiata, con I = [1, 100].
 % Non possiamo dire lo stesso per il condizionamento in norma 2, che non ci
 % esce monotona.
 
@@ -40,10 +40,11 @@ end
 fprintf("\n2.3\n")
 i = 1;
 while i <= 100
+    fprintf("\nn = %d\n", i);
     Bn = triu(-ones(i, i), 1) + eye(i);
-    Bn(i, 1) = Bn(i, 1) - (2^(2-i));
-    fprintf("\nn = %d", i);
-    fprintf("\nValore singolare minimo: %.3e\n", min(abs(eig(Bn))));
+    fprintf("\nAutovalore minimo non perturbata: %.3e\n", min(abs(eig(Bn))));
+    Bn(i, 1) = Bn(i, 1) - (2^(2-i));    
+    fprintf("Autovalore minimo perturbata: %.3e\n", min(abs(eig(Bn))));
     i = (i >= 50) * (i + 10) + (i >= 5 && i < 50) * (i + 5) + (i < 5) * (i + 1);
 end
 
@@ -51,5 +52,6 @@ end
 % 2.4
 % La perturbazione su B(n,1)​ rende B quasi singolare: un 
 % autovalore è vicino a 0 e il valore singolare minimo risulta molto 
-% piccolo. In termini di rango numerico, le colonne diventano quasi 
-% dipendenti, e il condizionamento in norma 2 cresce sensibilmente.
+% piccolo con n maggiori e vicini a 2. In termini di rango numerico, 
+% le colonne diventano quasi dipendenti.
+ 
